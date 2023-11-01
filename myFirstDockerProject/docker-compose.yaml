@@ -1,0 +1,31 @@
+version: '3'
+services:
+
+  # База данных
+  db.postgresql:
+    container_name: db.postgresql
+    # Имя образа - на основе которого будет создан контейнер
+    image: postgres:16
+    # Переменные окружения (логин, пароль и тд, для создания контейнера)
+    # https://hub.docker.com/_/postgres - описываются в документации
+    environment:
+      - SOME_VALUE=value
+    env_file:
+      - .env
+    # Разрешить доступ с родительской машины
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./volumes/db.postgresql:/var/lib/postgresql
+
+  mongo:
+    image: mongo
+    env_file:
+      - .env
+
+  mongo-express:
+      image: mongo-express
+      ports:
+        - 8081:8081
+      env_file:
+        - .env
