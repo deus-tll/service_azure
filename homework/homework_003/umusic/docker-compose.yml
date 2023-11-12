@@ -1,8 +1,87 @@
 version: '3.8'
 
 services:
+  api.gateway:
+    image: nginx:alpine
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "80:80"
+
+  api.artists.sunny:
+    build: ./backend/artists
+    volumes:
+      - ./backend/artists:/usr/src/app
+    command: sh -c "npm install && npm start"
+    container_name: api.artists.sunny
+    environment:
+      - SERVER_NAME=api.artists.sunny
+
+  api.artists.jonny:
+    build: ./backend/artists
+    volumes:
+      - ./backend/artists:/usr/src/app
+    command: sh -c "npm install && npm start"
+    container_name: api.artists.jonny
+    environment:
+      - SERVER_NAME=api.artists.jonny
+
+  api.audios.sunny:
+    build: ./backend/audios
+    volumes:
+      - ./backend/audios:/usr/src/app
+    command: sh -c "npm install && npm start"
+    container_name: api.audios.sunny
+    environment:
+      - SERVER_NAME=api.audios.sunny
+
+  api.audios.jonny:
+    build: ./backend/audios
+    volumes:
+      - ./backend/audios:/usr/src/app
+    command: sh -c "npm install && npm start"
+    container_name: api.audios.jonny
+    environment:
+      - SERVER_NAME=api.audios.jonny
+
+  api.listeners.sunny:
+    build: ./backend/listeners
+    volumes:
+      - ./backend/listeners:/usr/src/app
+    command: sh -c "npm install && npm start"
+    container_name: api.listeners.sunny
+    environment:
+      - SERVER_NAME=api.listeners.sunny
+
+  api.listeners.jonny:
+    build: ./backend/listeners
+    volumes:
+      - ./backend/listeners:/usr/src/app
+    command: sh -c "npm install && npm start"
+    container_name: api.listeners.jonny
+    environment:
+      - SERVER_NAME=api.listeners.jonny
+
+  api.playlists.sunny:
+    build: ./backend/playlists
+    volumes:
+      - ./backend/playlists:/usr/src/app
+    command: sh -c "npm install && npm start"
+    container_name: api.playlists.sunny
+    environment:
+      - SERVER_NAME=api.playlists.sunny
+
+  api.playlists.jonny:
+    build: ./backend/playlists
+    volumes:
+      - ./backend/playlists:/usr/src/app
+    command: sh -c "npm install && npm start"
+    container_name: api.playlists.jonny
+    environment:
+      - SERVER_NAME=api.playlists.jonny
+
   db:
-    build: ./Db
+    build: ./db
     ports:
       - "1433:1433"
     env_file:

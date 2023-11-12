@@ -40,7 +40,7 @@ create table [Users](
 	[Email] varchar(256) not null,
 	[Nickname] nvarchar(128) not null,
 	[RegistrationDate] datetime not null default(GetDate()),
-	[AvatarLink] varchar(2048) null
+	[AvatarLink] varchar(2048) null,
 
 	constraint PK_Users_Id primary key([Id]),
 	constraint CK_Users_Username check([Username] <> ''),
