@@ -1,6 +1,117 @@
 version: '3'
 services:
 
+  api.gateway:
+    image: nginx:alpine
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "80:80"
+
+  front.public:
+    build: ./frontend/public
+    volumes:
+      - ./frontend/public:/usr/src/app
+    command: sh -c " npm install && npm start "
+
+  front.admin:
+    build: ./frontend/admin
+    volumes:
+      - ./frontend/admin:/usr/src/app
+    command: sh -c " npm install && npm start "
+
+
+  api.comments:
+    build: ./backend/comments
+    volumes:
+      - ./backend/comments:/usr/src/app
+    command: sh -c " npm install && npm start "
+    container_name: api.comments
+    environment:
+      - SERVER_NAME=api.comments
+
+#  api.likes:
+#    build: ./backend/likes
+#    volumes:
+#      - ./backend/likes:/usr/src/app
+#    command: sh -c " npm install && npm start "
+#    container_name: api.likes
+#    environment:
+#      - SERVER_NAME=api.likes
+
+  api.likes.sunny:
+    build: ./backend/likes
+    volumes:
+      - ./backend/likes:/usr/src/app
+    command: sh -c " npm install && npm start "
+    container_name: api.likes.sunny
+    environment:
+      - SERVER_NAME=api.likes.sunny
+
+  api.likes.jonny:
+    build: ./backend/likes
+    volumes:
+      - ./backend/likes:/usr/src/app
+    command: sh -c " npm install && npm start "
+    container_name: api.likes.jonny
+    environment:
+      - SERVER_NAME=api.likes.jonny
+
+  api.posts:
+    build: ./backend/posts
+    volumes:
+      - ./backend/posts:/usr/src/app
+    command: sh -c " npm install && npm start "
+    container_name: api.posts
+    environment:
+      - SERVER_NAME=api.posts
+
+  api.users:
+    build: ./backend/users
+    volumes:
+      - ./backend/users:/usr/src/app
+    command: sh -c " npm install && npm start "
+    container_name: api.users
+    environment:
+      - SERVER_NAME=api.users
+
+#  api.gateway:
+#    image: nginx:alpine
+#    volumes:
+#      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+#    ports:
+#      - "80:80"
+#
+#  webserver.jonny:
+#    build: ./WebServer
+#    volumes:
+#      - ./WebServer:/usr/src/app
+#    command: sh -c " npm install && npm start "
+#    container_name: webserver.jonny
+#    environment:
+#      - SERVER_NAME=webserver.jonny
+#
+#  webserver.sunny:
+#    build: ./WebServer
+#    volumes:
+#      - ./WebServer:/usr/src/app
+#    command: sh -c " npm install && npm start "
+#    container_name: webserver.sunny
+#    environment:
+#      - SERVER_NAME=webserver.sunny
+
+
+#  webserver:
+#    build: ./WebServer
+#    volumes:
+#      - ./WebServer:/usr/src/app
+#    command: sh -c " npm install && npm start "
+#    container_name: webserver
+#    environment:
+#      - SERVER_NAME=webserver
+#    ports:
+#      - "80:80"
+
   # База данных
   db.postgresql:
     container_name: db.postgresql
@@ -18,14 +129,24 @@ services:
     volumes:
       - ./volumes/db.postgresql:/var/lib/postgresql
 
+  # inMemory DB - используется для кеширвоания и обмена сообщениями
+  db.redis:
+    image: redis:latest
+    ports:
+      - "6380:6379"
+    volumes:
+      - ./volumes/redis:/data
+
   mongo:
     image: mongo
+    ports:
+      - "27017:27017"
     env_file:
       - .env
 
   mongo-express:
-      image: mongo-express
-      ports:
-        - 8081:8081
-      env_file:
-        - .env
+    image: mongo-express
+    ports:
+      - "8081:8081"
+    env_file:
+      - .env

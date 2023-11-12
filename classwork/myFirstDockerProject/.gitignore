@@ -1,3 +1,6 @@
 volumes
 .idea
 .env
+
+vendor
+node_modules
