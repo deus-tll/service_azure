@@ -1,6 +1,27 @@
 version: '3'
 services:
 
+  ai.computer_vision:
+    container_name: ai.computer_vision
+    build: ./backend/ai_computer_vision
+    volumes:
+      - ./backend/ai_computer_vision/src:/usr/src/app
+    command: sh -c " npm install && npm start "
+    env_file:
+      - .env
+
+
+  storage.minio:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9009:9009"
+    volumes:
+      - ./volumes/storages/minio:/data
+    env_file:
+      - .env
+    command: server --console-address :9009 /data
+
   # Для определения кому обрабатывать тот или иной запрос мне нужен посредник
   # он по части маршрута определит - какой из контейнеров должен обработать запрос
   # в идеале - он передаст запрос самому свободному контейнеру (но это уже работа devOps)
@@ -11,6 +32,8 @@ services:
     ports:
       - "80:80"
 
+
+
   # Этот контейнер будет работать с авторизацией и аутентификацией пользователя
   api.auth:
     build: ./backend/auth
@@ -20,6 +43,45 @@ services:
     container_name: api.auth
     env_file:
       - .env
+
+  # Контейнер загрузки файлов
+  api.minio.upload:
+    build: backend/minio_storage
+    volumes:
+      - ./backend/minio_storage/src:/usr/src/app
+    command: sh -c " npm install && npm start "
+    container_name: api.minio.upload
+    env_file:
+      - .env
+
+  api.azure.upload:
+    build: backend/azure_storage
+    volumes:
+      - ./backend/azure_storage/src:/usr/src/app
+    command: sh -c " npm install && npm start "
+    container_name: api.azure.upload
+    env_file:
+      - .env
+
+  # Принимает все уведомления и решает - куда какое отсылать
+  notifications.router:
+    container_name: notifications.router
+    build: ./notifications/notification_router
+    volumes:
+      - ./notifications/notification_router/src:/usr/src/app
+    command: sh -c " npm install && npm start "
+    env_file:
+      - .env
+
+  notifications.email:
+    container_name: notifications.email
+    build: ./notifications/email
+    volumes:
+      - ./notifications/email/src:/usr/src/app
+    command: sh -c " npm install && npm start "
+    env_file:
+      - .env
+
 
   # Контейнер для обмена сообщениями по WebSocket соединению
   socket.jonny:

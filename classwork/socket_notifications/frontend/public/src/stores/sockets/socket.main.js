@@ -27,6 +27,12 @@ export const useSocketMainStore = defineStore('socket.main', {
                 console.log('Catch message from server:', data);
             });
 
+
+            this.socket.on('ai.computer.vision', (data) => {
+                console.log('Catch message from computer vision:');
+                console.log(data);
+            });
+
             // Пинг с сервера
             this.socket.on('ping', (data) => {
                 toast.info('Ping from server: \n' + new Date(data).toLocaleString(), {
@@ -47,7 +53,8 @@ export const useSocketMainStore = defineStore('socket.main', {
             });
 
             this.socket.on('user.login', (data) => {
-                toast.info('New User Login \n' + new Date(data).toLocaleString(), {
+                let user = JSON.parse(data)
+                toast.info('New User Login \n' + user.name, {
                     theme: 'colored',
                     position: toast.POSITION.BOTTOM_LEFT,
                     transition: "zoom",

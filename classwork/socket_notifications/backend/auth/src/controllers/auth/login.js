@@ -1,6 +1,6 @@
 let jwt = require('jsonwebtoken');
 
-let rabbitMQ = require('../../helpers/rabbit');
+let rabbitMQ_notification = require('../../helpers/rabbit');
 let socketEmitter = require('../../helpers/socket_emitter');
 
 // Получить секретный ключ для создания токена
@@ -16,8 +16,10 @@ exports.login = function (request, response) {
     let user = request.body;
 
     // Отсылка сообщения о новом входе
-    rabbitMQ('user.login', user);
-    socketEmitter('user.login', user);
+    rabbitMQ_notification('user.login', user);
+
+    // Является плохой практикой
+    // socketEmitter('user.login', user);
 
 
 
