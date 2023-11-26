@@ -1,0 +1,17 @@
+{
+  "name": "notification_router",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "deus",
+  "license": "ISC",
+  "dependencies": {
+    "@socket.io/redis-emitter": "^5.1.0",
+    "amqplib": "^0.10.3",
+    "redis": "^4.6.11"
+  }
+}
