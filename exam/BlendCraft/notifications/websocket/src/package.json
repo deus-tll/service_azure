@@ -1,0 +1,17 @@
+{
+  "name": "websocket",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "deus",
+  "license": "ISC",
+  "dependencies": {
+    "@socket.io/redis-adapter": "^8.2.1",
+    "redis": "^4.6.11",
+    "socket.io": "^4.7.2"
+  }
+}

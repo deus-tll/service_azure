@@ -1,0 +1,114 @@
+version: '3.8'
+
+services:
+  api.gateway:
+    image: nginx:alpine
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "80:80"
+
+  rabbit.mq:
+    image: rabbitmq:3.12.0-management-alpine
+    env_file:
+      - .env
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  notifications.router:
+    container_name: notifications.router
+    build: ./notifications/notification_router
+    volumes:
+      - ./notifications/notification_router/src:/usr/src/app
+    command: sh -c " npm install && npm start "
+    env_file:
+      - .env
+
+  socket.connection.1:
+    container_name: socket.connection.1
+    build: ./notifications/websocket
+    volumes:
+      - ./notifications/websocket/src:/usr/src/app
+    command: sh -c " npm install && npm start "
+    environment:
+      - SERVER_NAME=SocketConnection_1
+      - SERVER_PORT=80
+    env_file:
+      - .env
+
+  redis.sockets:
+    image: 'redis:alpine'
+    volumes:
+      - './volumes/db/redis/sockets:/data'
+
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    volumes:
+      - mongodb_data:/data/db
+    ports:
+      - "27017:27017"
+    env_file:
+      - .env
+
+  api.database.manager:
+    container_name: api.database.manager
+    build: ./backend/database_manager
+    volumes:
+      - ./backend/database_manager/src:/usr/src/app
+    command: sh -c " npm install && npm start "
+    environment:
+      MONGO_URL: 'mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017'
+      MONGO_DB_NAME: 'BlendCraft_MongoDB'
+    env_file:
+      - .env
+
+  api.image.manager:
+    container_name: api.image.manager
+    build: ./backend/image_manager
+    volumes:
+      - ./backend/image_manager/src:/usr/src/app
+    command: sh -c " npm install && npm start "
+    depends_on:
+      - api.database.manager
+    env_file:
+      - .env
+
+  api.image.bg.remover:
+    container_name: api.image.bg.remover
+    build: ./backend/image_bg_remover
+    volumes:
+      - ./backend/image_bg_remover/src:/usr/src/app
+    command: sh -c " npm install && npm start "
+    env_file:
+      - .env
+
+  api.image.mixer:
+    container_name: api.image.mixer
+    build: ./backend/image_mixer
+    volumes:
+      - ./backend/image_mixer/src:/usr/src/app
+    command: sh -c " npm install && npm start "
+    env_file:
+      - .env
+
+  api.azure.upload:
+    container_name: api.azure.upload
+    build: ./backend/azure_storage
+    volumes:
+      - ./backend/azure_storage/src:/usr/src/app
+    command: sh -c " npm install && npm start "
+    env_file:
+      - .env
+
+  api.auth:
+    container_name: api.auth
+    build: ./backend/auth
+    volumes:
+      - ./backend/auth/src:/usr/src/app
+    command: sh -c " npm install && npm start "
+    depends_on:
+      - api.database.manager
+    env_file:
+      - .env
