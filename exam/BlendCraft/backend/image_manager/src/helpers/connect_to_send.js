@@ -5,18 +5,19 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 
-const RABBITMQ_DEFAULT_USER = process.env.RABBITMQ_DEFAULT_USER || 'root';
-const RABBITMQ_DEFAULT_PASS = process.env.RABBITMQ_DEFAULT_PASS || 'password';
-const RABBITMQ_SERVER = process.env.RABBITMQ_SERVER || 'rabbit.mq';
-const RABBITMQ_PORT = process.env.RABBITMQ_PORT || 5672;
-const RABBITMQ_CONNECTION_URI = `amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@${RABBITMQ_SERVER}:${RABBITMQ_PORT}`;
+const {
+  RABBITMQ_DEFAULT_USER,
+  RABBITMQ_DEFAULT_PASS,
+  RABBITMQ_SERVER,
+  RABBITMQ_PORT
+} = process.env;
 
-const RABBITMQ_QUEUE_IMAGE_BG_REMOVER = process.env.RABBITMQ_QUEUE_IMAGE_BG_REMOVER;
+const RABBITMQ_CONNECTION_URI = `amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@${RABBITMQ_SERVER}:${RABBITMQ_PORT}`;
 
 
 let channel;
 
-const connectToRabbitMQ = () => {
+const connectToRabbitMQ = (queue) => {
   return new Promise((resolve, reject) => {
     amqp.connect(RABBITMQ_CONNECTION_URI, {}, async (errorConnect, connection) => {
       if (errorConnect) {
@@ -32,13 +33,13 @@ const connectToRabbitMQ = () => {
           reject(errorChannel);
         }
 
-        await _channel.assertQueue(RABBITMQ_QUEUE_IMAGE_BG_REMOVER, {}, (errorQueue) => {
+        await _channel.assertQueue(queue, {}, (errorQueue) => {
           if (errorQueue) {
             console.error(errorQueue);
             reject(errorQueue);
           }
 
-          console.debug(`\"${RABBITMQ_QUEUE_IMAGE_BG_REMOVER}\" queue has been asserted to send.`);
+          console.debug(`\"${queue}\" queue has been asserted to send.`);
         });
 
         channel = _channel;
@@ -49,13 +50,13 @@ const connectToRabbitMQ = () => {
 };
 
 
-const rabbitMQ_notification = async (craftedImage) => {
+const rabbitMQ_notification = async (queue, data) => {
   try {
     if (!channel) {
-      await connectToRabbitMQ();
+      await connectToRabbitMQ(queue);
     }
 
-    channel.sendToQueue(RABBITMQ_QUEUE_IMAGE_BG_REMOVER, Buffer.from(JSON.stringify(craftedImage)));
+    channel.sendToQueue(queue, Buffer.from(JSON.stringify(data)));
   } catch (error) {
     console.error("Error in rabbitMQ_notification:", error);
     throw error;

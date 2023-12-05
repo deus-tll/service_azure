@@ -1,21 +1,20 @@
 import dotenv from 'dotenv';
-import rabbitMQ_notification from "../../../notifications/notification_router/src/helpers/connect_to_send.js"
-import connectToRabbitMQAndStartConsuming from "../../../notifications/notification_router/src/helpers/connect_to_consume.js"
+import uploadFileToStorage from "./helpers/upload_file_to_storage.js";
+import rabbitMQ_notification from "./helpers/connect_to_send.js";
+import connectToRabbitMQAndStartConsuming from "./helpers/connect_to_consume.js";
 import Jimp from "jimp";
 
 
 dotenv.config();
 
 
-const RABBITMQ_QUEUE_IMAGE_MANAGER = process.env.RABBITMQ_QUEUE_IMAGE_MANAGER;
-const RABBITMQ_QUEUE_IMAGE_MIXER = process.env.RABBITMQ_QUEUE_IMAGE_MIXER;
-
+const { RABBITMQ_QUEUE_IMAGE_MANAGER, RABBITMQ_QUEUE_IMAGE_MIXER } = process.env;
 
 
 const processMixingImages = async (data, channel) => {
   let craftedImage = JSON.parse(data.content.toString());
 
-  Jimp.read(craftedImage.photoFrontUrlNoBg)
+  Jimp.read(craftedImage.photoFrontNoBgUrl)
     .then(load_photo_front_no_bg => {
       Jimp.read(craftedImage.photoBackgroundUrl)
         .then(async (load_photo_background) => {
@@ -24,18 +23,22 @@ const processMixingImages = async (data, channel) => {
           const height = Math.max(load_photo_front_no_bg.getHeight(), load_photo_background.getHeight());
 
           const mergedImage = new Jimp(width, height);
-
           mergedImage.composite(load_photo_background, 0, 0);
           mergedImage.composite(load_photo_front_no_bg, 0, 0);
 
-
-          // реалізувати збереження у сховище
-
+          const fileName = "photo_result_mix";
           const imageBuffer = await mergedImage.getBufferAsync('image/jpeg');
+          const file = new File([imageBuffer], `${fileName}.jpeg`, { type: `image/jpeg` });
 
+          const uploadResult = await uploadFileToStorage(craftedImage.id, file, fileName);
 
-          await rabbitMQ_notification(RABBITMQ_QUEUE_IMAGE_MANAGER, craftedImage)
-          // Далее пойдет сообщение
+          if (uploadResult.success) {
+            craftedImage.photoMixResultUrl = uploadResult.data.photoUrl;
+
+            await rabbitMQ_notification(RABBITMQ_QUEUE_IMAGE_MANAGER, craftedImage);
+          } else {
+            // відправити на rabbitMQ помилку
+          }
         })
         .catch(err => {
           console.error(err);
@@ -44,8 +47,10 @@ const processMixingImages = async (data, channel) => {
     .catch(err => {
       console.error(err);
     });
-}
 
+  console.log("CRAFTED IMAGE AFTER IMAGE_MIXER", craftedImage);
+  channel.ack(data);
+}
 
 
 (async () => {

@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 
-const API_REMOVE_BG_TOKEN = process.env.API_REMOVE_BG_TOKEN;
+const { API_REMOVE_BG_TOKEN } = process.env;
 const apiUrl = 'https://api.ximilar.com/removebg/precise/removebg';
 
 

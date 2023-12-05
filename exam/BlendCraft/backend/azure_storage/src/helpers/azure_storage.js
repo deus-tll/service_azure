@@ -8,7 +8,7 @@ const sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountK
 const blobServiceClient = new BlobServiceClient(`https://${accountName}.blob.core.windows.net`, sharedKeyCredential);
 const containerClient = blobServiceClient.getContainerClient(containerName);
 
-export async function uploadImage(craftedImageId, file, fileName) {
+async function uploadImage(craftedImageId, file, fileName) {
   if (!(await containerClient.exists())) {
     await containerClient.create();
   }
@@ -21,3 +21,6 @@ export async function uploadImage(craftedImageId, file, fileName) {
     photoUrl: blobClient.url
   };
 }
+
+
+export default uploadImage;

@@ -1,6 +1,6 @@
 import express from 'express';
 import multer from 'multer';
-import { uploadImage } from '../helpers/azure_storage';
+import uploadImage from '../helpers/azure_storage.js';
 
 
 const router = express.Router();

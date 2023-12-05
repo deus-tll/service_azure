@@ -3,8 +3,8 @@ import multer from 'multer';
 import jwt from 'jsonwebtoken';
 import {v4} from 'uuid';
 import dotenv from 'dotenv';
-import {uploadFileToStorage} from "../helpers/upload_file_to_storage.js";
-import rabbitMQ_notification from "../../../../notifications/notification_router/src/helpers/connect_to_send.js";
+import uploadFileToStorage from "../helpers/upload_file_to_storage.js";
+import rabbitMQ_notification from "../helpers/connect_to_send.js";
 
 
 dotenv.config();
@@ -69,7 +69,7 @@ router.post('/craft_image', getUserIdFromToken, upload.fields([
     const photoFrontResponse = await uploadFileToStorage(craftedImage.id, filePhotoFront, 'photo_front');
     const photoBackgroundResponse = await uploadFileToStorage(craftedImage.id, filePhotoBackground, 'photo_background');
 
-    if (!photoFrontResponse || !photoBackgroundResponse) {
+    if (!photoFrontResponse.success || !photoBackgroundResponse.success) {
       console.error('Failed to upload one or more photos.');
       return res.status(500).json({ message: 'Failed to upload one or more photos.' });
     }
@@ -83,8 +83,7 @@ router.post('/craft_image', getUserIdFromToken, upload.fields([
 
     await rabbitMQ_notification(RABBITMQ_QUEUE_IMAGE_BG_REMOVER, craftedImage);
 
-    // користувач повинен знати id об'єкту результату
-    // фронту потрібно мати два посилання на завантажені зображення
+
     res.status(201).json({ message: 'Files uploaded successfully.', craftedImage: craftedImage });
   }
   catch (error) {

@@ -1,12 +1,9 @@
-const REDIS_SOCKET_HOST = process.env.REDIS_SOCKET_HOST;
-const REDIS_SOCKET_PORT = process.env.REDIS_SOCKET_PORT;
-const REDIS_SOCKET_CONNECTION_STRING = `redis://${REDIS_SOCKET_HOST}:${REDIS_SOCKET_PORT}`;
-
-
-
 import {Emitter} from "@socket.io/redis-emitter";
 import {createClient} from "redis";
 
+
+const { REDIS_SOCKET_HOST , REDIS_SOCKET_PORT } = process.env;
+const REDIS_SOCKET_CONNECTION_STRING = `redis://${REDIS_SOCKET_HOST}:${REDIS_SOCKET_PORT}`;
 
 
 let io;
@@ -16,7 +13,7 @@ const redisClient = createClient({
 });
 
 redisClient.on('connect', () => {
-  console.debug('Connection to Redis server is ok');
+  console.debug('Connection to Redis server has been established.');
 });
 
 redisClient.connect().then(() => {

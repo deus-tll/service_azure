@@ -11,7 +11,7 @@ const RABBITMQ_QUEUE_NOTIFICATIONS_AUTH_REGISTER = process.env.RABBITMQ_QUEUE_NO
 
 
 import amqp from "amqplib/callback_api.js";
-import socketEmitter from "./helpers/socket_emitter.js";
+socketEmitter
 
 
 
