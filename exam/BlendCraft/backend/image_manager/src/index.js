@@ -13,6 +13,8 @@ const RABBITMQ_QUEUE_IMAGE_MANAGER = process.env.RABBITMQ_QUEUE_IMAGE_MANAGER;
 const RABBITMQ_QUEUE_NOTIFICATIONS = process.env.RABBITMQ_QUEUE_NOTIFICATIONS;
 const RABBITMQ_QUEUE_IMAGE_CRAFTING_FINISHED = process.env.RABBITMQ_QUEUE_IMAGE_CRAFTING_FINISHED;
 
+app.use(express.json());
+
 app.use('/api/image/manager', craftImageRouter);
 
 
