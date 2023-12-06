@@ -48,6 +48,16 @@ function App() {
     console.log(user);
   };
 
+  const handleComputerVision = (describingOfImage) => {
+    toast.info(`Result: \n${describingOfImage}`, {
+      theme: 'colored',
+      position: 'bottom-left',
+      autoClose: 5000,
+      closeOnClick: true,
+    });
+    console.log(describingOfImage);
+  };
+
   return (
   <div className="App">
     <ToastContainer/>
@@ -71,7 +81,8 @@ function App() {
       onServerName={handleServerName}
       onPing={handlePing}
       onUserLogin={handleUserLogin}
-      onUserRegister={handleUserRegister}/>
+      onUserRegister={handleUserRegister}
+      onComputerVision={handleComputerVision}/>
   </div>
   );
 }

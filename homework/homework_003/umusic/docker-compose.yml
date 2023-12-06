@@ -42,17 +42,17 @@ services:
     volumes:
       - './volumes/db/redis/sockets:/data'
 
-  frontend.public:
-    container_name: frontend.public
-    build: ./frontend/public
-    volumes:
-      - ./frontend/public:/usr/src/app
-    stdin_open: true
-    tty: true
-    ports:
-      - "3000:3000"
-    env_file:
-      - .env
+#  frontend.public:
+#    container_name: frontend.public
+#    build: ./frontend/public
+#    volumes:
+#      - ./frontend/public:/usr/src/app
+#    stdin_open: true
+#    tty: true
+#    ports:
+#      - "3000:3000"
+#    env_file:
+#      - .env
 
   api.auth:
     container_name: api.auth
@@ -79,6 +79,15 @@ services:
     build: backend/minio
     volumes:
       - ./backend/minio/src:/usr/src/app
+    command: sh -c " npm install && npm start "
+    env_file:
+      - .env
+
+  api.ai.computer.vision:
+    container_name: api.ai.computer.vision
+    build: ./backend/ai_computer_vision
+    volumes:
+      - ./backend/ai_computer_vision/src:/usr/src/app
     command: sh -c " npm install && npm start "
     env_file:
       - .env

@@ -7,11 +7,11 @@ const RABBITMQ_CONNECTION_URI = `amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFA
 const RABBITMQ_QUEUE_NOTIFICATIONS = process.env.RABBITMQ_QUEUE_NOTIFICATIONS;
 const RABBITMQ_QUEUE_NOTIFICATIONS_AUTH_LOGIN = process.env.RABBITMQ_QUEUE_NOTIFICATIONS_AUTH_LOGIN;
 const RABBITMQ_QUEUE_NOTIFICATIONS_AUTH_REGISTER = process.env.RABBITMQ_QUEUE_NOTIFICATIONS_AUTH_REGISTER;
-
+const RABBITMQ_QUEUE_COMPUTER_VISION = process.env.RABBITMQ_QUEUE_COMPUTER_VISION;
 
 
 import amqp from "amqplib/callback_api.js";
-socketEmitter
+import socketEmitter from "./helpers/socket_emitter.js";
 
 
 
@@ -48,6 +48,10 @@ amqp.connect(RABBITMQ_CONNECTION_URI, {}, async (errorConnect, connection) => {
             break;
 
           case RABBITMQ_QUEUE_NOTIFICATIONS_AUTH_REGISTER:
+            socketEmitter(notification.name, notification.data);
+            break;
+
+          case RABBITMQ_QUEUE_COMPUTER_VISION:
             socketEmitter(notification.name, notification.data);
             break;
         }

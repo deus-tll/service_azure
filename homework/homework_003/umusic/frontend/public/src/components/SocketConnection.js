@@ -10,10 +10,10 @@ const RABBITMQ_QUEUE_NOTIFICATIONS_AUTH_LOGIN =
   process.env.RABBITMQ_QUEUE_NOTIFICATIONS_AUTH_LOGIN || 'notifications.auth.login';
 const RABBITMQ_QUEUE_NOTIFICATIONS_AUTH_REGISTER =
   process.env.RABBITMQ_QUEUE_NOTIFICATIONS_AUTH_REGISTER || "notifications.auth.register";
+const RABBITMQ_QUEUE_COMPUTER_VISION = process.env.RABBITMQ_QUEUE_COMPUTER_VISION || "ai.computer.vision";
 
 
-
-const SocketConnection = ({onConnect, onDisconnect, onServerName, onPing, onUserLogin, onUserRegister}) => {
+const SocketConnection = ({onConnect, onDisconnect, onServerName, onPing, onUserLogin, onUserRegister, onComputerVision}) => {
   useEffect(() => {
     const socket = io(SOCKET_SERVER);
 
@@ -33,6 +33,11 @@ const SocketConnection = ({onConnect, onDisconnect, onServerName, onPing, onUser
     socket.on(RABBITMQ_QUEUE_NOTIFICATIONS_AUTH_REGISTER, (data) => {
       let user = JSON.parse(data);
       onUserRegister(user);
+    });
+
+    socket.on(RABBITMQ_QUEUE_COMPUTER_VISION, (data) => {
+      let describingOfImage = JSON.parse(data);
+      onComputerVision(describingOfImage);
     });
 
     socket.on('connect', () => {
