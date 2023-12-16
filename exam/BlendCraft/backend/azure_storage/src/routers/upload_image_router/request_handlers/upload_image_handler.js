@@ -1,13 +1,6 @@
-import express from 'express';
-import multer from 'multer';
-import uploadImage from '../helpers/azure_storage.js';
+import uploadImage from "../../../helpers/azure_storage.js";
 
-
-const router = express.Router();
-const upload = multer();
-
-
-router.post('/upload_images', upload.single('file'), async(req, res) => {
+const uploadImageHandler = async (req, res) => {
   try {
     const craftedImageId = req.body.craftedImageId;
     const fileName = req.body.fileName
@@ -21,6 +14,6 @@ router.post('/upload_images', upload.single('file'), async(req, res) => {
     console.error(error);
     res.status(500).json({ message: 'Internal Server Error' });
   }
-});
+};
 
-export default router;
+export default uploadImageHandler;

@@ -1,8 +1,4 @@
 import amqp from "amqplib/callback_api.js";
-import dotenv from 'dotenv';
-
-
-dotenv.config();
 
 
 const {

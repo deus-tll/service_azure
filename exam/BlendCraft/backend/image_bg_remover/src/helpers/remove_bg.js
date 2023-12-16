@@ -1,15 +1,11 @@
 import axios from 'axios';
-import dotenv from 'dotenv';
-
-
-dotenv.config();
 
 
 const { API_REMOVE_BG_TOKEN } = process.env;
 const apiUrl = 'https://api.ximilar.com/removebg/precise/removebg';
 
 
-export const removeBackground = async (imageUrl) => {
+const removeBackground = async (imageUrl) => {
   try {
     const requestData = {
       records: [
@@ -34,3 +30,5 @@ export const removeBackground = async (imageUrl) => {
     throw error;
   }
 };
+
+export default removeBackground;

@@ -1,7 +1,7 @@
 import {BlobServiceClient, StorageSharedKeyCredential} from '@azure/storage-blob';
 
-const accountName = '';
-const accountKey = '';
+const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
+const accountKey = process.env.AZURE_STORAGE_ACCOUNT_KEY;
 const containerName = 'BlendCraftImages';
 
 const sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountKey);

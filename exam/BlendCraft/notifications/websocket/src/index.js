@@ -1,10 +1,6 @@
 import { Server } from "socket.io";
 import { createClient } from "redis";
 import { createAdapter } from "@socket.io/redis-adapter";
-import dotenv from 'dotenv';
-
-
-dotenv.config();
 
 
 const REDIS_SOCKET_HOST = process.env.REDIS_SOCKET_HOST;

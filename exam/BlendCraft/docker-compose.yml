@@ -112,3 +112,14 @@ services:
       - api.database.manager
     env_file:
       - .env
+
+  frontend.public:
+    container_name: frontend.public
+    build:
+      context: ./frontend/public
+    volumes:
+      - ./frontend/public:/usr/src/app
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env

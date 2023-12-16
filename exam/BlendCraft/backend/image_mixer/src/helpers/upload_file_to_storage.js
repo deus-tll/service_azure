@@ -1,5 +1,8 @@
 import axios from 'axios';
 
+const axiosAzureStorage = axios.create({
+  baseURL: 'http://api.azure.upload',
+});
 
 async function uploadFileToStorage(craftedImageId, file, fileName) {
   try {
@@ -8,7 +11,7 @@ async function uploadFileToStorage(craftedImageId, file, fileName) {
     formData.append('craftedImageId', craftedImageId);
     formData.append('fileName', fileName);
 
-    const uploadResponse = await axios.post('/api/azure/upload/upload_images', formData, {
+    const uploadResponse = await axiosAzureStorage.post('/api/azure/upload/upload_image', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       },
@@ -16,15 +19,16 @@ async function uploadFileToStorage(craftedImageId, file, fileName) {
 
     return {
       success: true,
-      message: 'File uploaded successfully',
+      message: 'File uploaded successfully to storage.',
       data: uploadResponse.data,
     };
   }
   catch (error) {
-    console.error('Error processing and uploading file:', error);
+    const message = 'Error processing and uploading file to storage';
+    console.error(`${message}: `, error);
     return {
       success: false,
-      message: 'Error processing and uploading file',
+      message: message,
       error: error.message,
     };
   }

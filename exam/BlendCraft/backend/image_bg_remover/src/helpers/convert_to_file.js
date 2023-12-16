@@ -2,7 +2,7 @@ import axios from 'axios';
 import sharp from 'sharp';
 
 
-export async function convertToFile(photoFrontUrlNoBg, fileName, type) {
+const convertToFile = async (photoFrontUrlNoBg, fileName, type) => {
   try {
     const response = await axios({
       method: 'get',
@@ -17,3 +17,5 @@ export async function convertToFile(photoFrontUrlNoBg, fileName, type) {
     console.error("Error converting photo from url to file.");
   }
 }
+
+export default convertToFile;

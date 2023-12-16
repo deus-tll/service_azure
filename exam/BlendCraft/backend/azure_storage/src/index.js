@@ -1,11 +1,12 @@
 import express from 'express';
-import uploadImageRouter from './routers/upload_image_router.js';
+import uploadImageRouter from './routers/upload_image_router/upload_image_router.js';
+
 
 const app = express();
 const port= 80;
 
-app.use(express.json());
 
+app.use(express.json());
 app.use('/api/azure/upload', uploadImageRouter);
 
 

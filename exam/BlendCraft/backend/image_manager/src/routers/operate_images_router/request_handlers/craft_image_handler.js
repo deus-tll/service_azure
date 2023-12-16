@@ -1,43 +1,10 @@
-import express from 'express';
-import multer from 'multer';
-import jwt from 'jsonwebtoken';
-import {v4} from 'uuid';
-import dotenv from 'dotenv';
-import uploadFileToStorage from "../helpers/upload_file_to_storage.js";
-import rabbitMQ_notification from "../helpers/connect_to_send.js";
-
-
-dotenv.config();
-
-
-const router = express.Router();
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+import {v4} from "uuid";
+import uploadFileToStorage from "../../../helpers/upload_file_to_storage.js";
+import rabbitMQ_notification from "../../../helpers/connect_to_send.js";
 
 const RABBITMQ_QUEUE_IMAGE_BG_REMOVER = process.env.RABBITMQ_QUEUE_IMAGE_BG_REMOVER;
 
-
-function getUserIdFromToken(req, res, next) {
-  const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
-
-  if (!token) {
-    return res.status(401).json({ message: 'Token not provided' });
-  }
-
-  try {
-    const decodedToken = jwt.verify(token, process.env.JWT_KEY);
-    req.userId = decodedToken.user.id;
-    next();
-  } catch (error) {
-    return res.status(401).json({ message: 'Invalid token' });
-  }
-}
-
-
-router.post('/craft_image', getUserIdFromToken, upload.fields([
-  { name: 'filePhotoFront', maxCount: 1 },
-  { name: 'filePhotoBackground', maxCount: 1 }
-]), async (req, res) => {
+const craftImageHandler = async (req, res) => {
   try {
     const userId = req.userId;
     const { name } = req.body;
@@ -59,15 +26,16 @@ router.post('/craft_image', getUserIdFromToken, upload.fields([
 
 
     const craftedImage = {
-      id: v4(),
+      _id: v4(),
       photoName: name,
       userId: userId,
       createdAt: Date.now()
     };
+    console.log("CRAFTED_IMAGE CREATED IN IMAGE_MANAGER", craftedImage);
 
 
-    const photoFrontResponse = await uploadFileToStorage(craftedImage.id, filePhotoFront, 'photo_front');
-    const photoBackgroundResponse = await uploadFileToStorage(craftedImage.id, filePhotoBackground, 'photo_background');
+    const photoFrontResponse = await uploadFileToStorage(craftedImage._id, filePhotoFront, 'photo_front');
+    const photoBackgroundResponse = await uploadFileToStorage(craftedImage._id, filePhotoBackground, 'photo_background');
 
     if (!photoFrontResponse.success || !photoBackgroundResponse.success) {
       console.error('Failed to upload one or more photos.');
@@ -78,18 +46,16 @@ router.post('/craft_image', getUserIdFromToken, upload.fields([
     craftedImage.photoBackgroundUrl = photoBackgroundResponse.data.photoUrl;
 
 
-    console.log("CRAFTED IMAGE AFTER IMAGE_MANAGER", craftedImage);
-
-
+    console.log("CRAFTED_IMAGE AFTER IMAGE_MANAGER", craftedImage);
     await rabbitMQ_notification(RABBITMQ_QUEUE_IMAGE_BG_REMOVER, craftedImage);
 
 
     res.status(201).json({ message: 'Files uploaded successfully.', craftedImage: craftedImage });
   }
   catch (error) {
-    console.error(error);
+    console.error("IMAGE_MANAGER_ERROR", error);
     res.status(500).json({ message: 'Internal Server Error.' });
   }
-});
+}
 
-export default router;
+export default craftImageHandler;

@@ -8,7 +8,7 @@ async function uploadFileToStorage(craftedImageId, file, fileName) {
     formData.append('craftedImageId', craftedImageId);
     formData.append('fileName', fileName);
 
-    const uploadResponse = await axios.post('/api/azure/upload/upload_images', formData, {
+    const uploadResponse = await axios.post('/api/azure/upload/upload_image', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       },
