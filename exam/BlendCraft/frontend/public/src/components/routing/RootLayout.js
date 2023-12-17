@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect} from "react";
 import { MainNavigation } from "./MainNavigation";
-import fetchUser from "../../redux/actions/userActions/actions";
+import {fetchUser} from "../../redux/actions/userActions/actions";
 
 const RootLayout = () => {
   const appName = 'Blend Craft';

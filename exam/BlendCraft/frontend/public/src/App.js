@@ -1,5 +1,5 @@
 import './App.css';
-import {createBrowserRouter, RouterProvider} from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import RootLayout from "./components/routing/RootLayout";
 import Home from "./components/pages/Home/Home";
 import CraftImage from "./components/pages/CraftImage/CraftImage";
@@ -18,7 +18,7 @@ function App() {
     }
   ]);
 
-  return <RouterProvider router={router} />;
+  return <RouterProvider router={router} basename={process.env.PUBLIC_URL} />;
 }
 
 export default App;

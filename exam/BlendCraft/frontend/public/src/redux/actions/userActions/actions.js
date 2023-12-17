@@ -2,9 +2,6 @@ import {dispatchUserError, dispatchUserRequest, dispatchUserSuccess} from "./dis
 import axios from "axios";
 
 
-const BASE_URL = 'http://localhost';
-
-
 export const fetchUser = () => async (dispatch) => {
   dispatch(dispatchUserRequest());
 
@@ -17,19 +14,17 @@ export const fetchUser = () => async (dispatch) => {
       console.log("FROM LOCAL STORAGE", {storedUser, storedToken});
     }
     else {
-      const response = await axios.get(`${BASE_URL}/api/auth/get_initial_user`);
+      const response = await axios.get('/api/auth/get_initial_user');
       const { accessToken, user } = response.data;
 
       localStorage.setItem('user', JSON.stringify(user));
       localStorage.setItem('token', accessToken);
 
-      dispatch(dispatchUserSuccess({ user: JSON.parse(storedUser) }));
-      console.log("FROM SERVER STORAGE", {user, accessToken});
+      dispatch(dispatchUserSuccess({ user: user }));
+      console.log("FROM SERVER", {user, accessToken});
     }
   }
   catch (error) {
     dispatch(dispatchUserError(error));
   }
 };
-
-export default fetchUser;
