@@ -2,7 +2,7 @@ import axios from 'axios';
 
 
 const { API_REMOVE_BG_TOKEN } = process.env;
-const apiUrl = 'https://api.ximilar.com/removebg/precise/removebg';
+const apiUrl = 'https://api.ximilar.com/removebg/fast/removebg';
 
 
 const removeBackground = async (imageUrl) => {

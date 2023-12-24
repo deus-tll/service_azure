@@ -1,26 +1,31 @@
 import axios from 'axios';
+import FormData from 'form-data';
 
 const axiosAzureStorage = axios.create({
   baseURL: 'http://api.azure.upload',
 });
 
-async function uploadFileToStorage(craftedImageId, file, fileName) {
+async function uploadFileToStorage(craftedImageId, file) {
   try {
+    const blob = new Blob([file.buffer], { type: file.type });
+    const blobBuff = await blob.arrayBuffer();
+
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('filePhoto', Buffer.from(blobBuff), file.name);
     formData.append('craftedImageId', craftedImageId);
-    formData.append('fileName', fileName);
+    formData.append('fileType', file.type);
 
     const uploadResponse = await axiosAzureStorage.post('/api/azure/upload/upload_image', formData, {
       headers: {
-        'Content-Type': 'multipart/form-data'
-      },
+        ...formData.getHeaders(),
+        'Content-Type': 'multipart/form-data',
+      }
     });
 
     return {
       success: true,
       message: 'File uploaded successfully to storage.',
-      data: uploadResponse.data,
+      data: uploadResponse.data.uploadedImage,
     };
   }
   catch (error) {

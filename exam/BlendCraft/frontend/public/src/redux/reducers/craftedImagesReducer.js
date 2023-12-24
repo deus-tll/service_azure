@@ -2,6 +2,7 @@ import craftedImagesActionTypes from "../actionTypes/craftedImagesActionTypes";
 
 const initialState  = {
   craftedImages: [],
+  currentCraftedImage: null,
   error: null,
   loading: false,
 };
@@ -16,6 +17,9 @@ const craftedImagesReducer = (state = initialState, action) => {
 
     case craftedImagesActionTypes.FETCH_CRAFTED_IMAGES_SUCCESS:
       return { ...state, loading: false, craftedImages: action.payload.craftedImages, error: null };
+
+    case craftedImagesActionTypes.FETCH_CRAFTED_IMAGE_SUCCESS:
+      return { ...state, loading: false, currentCraftedImage: action.payload.craftedImage, error: null };
 
     default:
       return state;

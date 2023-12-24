@@ -1,5 +1,5 @@
 import removeBackground from "./remove_bg.js";
-import convertToFile from "./convert_to_file.js";
+import convertToPngFileBuffer from "./convert_to_png_file_buffer.js";
 import uploadFileToStorage from "./upload_file_to_storage.js";
 import rabbitMQ_notification from "./connect_to_send.js";
 
@@ -13,11 +13,11 @@ const {
 
 
 const handleError = async (craftedImageId, message, error) => {
-  console.error(message, error);
+  console.error(`[${new Date().toISOString()}] ${message}`, error);
 
   await rabbitMQ_notification(RABBITMQ_QUEUE_NOTIFICATIONS, {
     name: RABBITMQ_QUEUE_ERROR_IMAGE_BG_REMOVER,
-    data: { craftedImageId, message, error }
+    data: { craftedImageId, message, error: error.message }
   });
 };
 
@@ -31,8 +31,14 @@ const callbackForConsume = async (data, channel) => {
 
     if (records && records.length > 0) {
       const photoFrontNoBgUrl = records[0]._output_url;
-      const photoFrontNoBgFile = await convertToFile(photoFrontNoBgUrl, "photo_front_no_background", "png");
-      const uploadResult = await uploadFileToStorage(craftedImage._id, photoFrontNoBgFile, "photo_front_no_background");
+      const fileType = "image/png";
+      const photoFrontNoBgFileBuffer = await convertToPngFileBuffer(photoFrontNoBgUrl);
+
+      const uploadResult = await uploadFileToStorage(craftedImage._id, {
+        buffer: photoFrontNoBgFileBuffer,
+        name: "photo_front_no_background",
+        type: fileType
+      });
 
       if (uploadResult.success) {
         craftedImage.photoFrontNoBgUrl = uploadResult.data.photoUrl;
@@ -44,7 +50,7 @@ const callbackForConsume = async (data, channel) => {
           rabbitMQ_notification(RABBITMQ_QUEUE_NOTIFICATIONS, {
             name: RABBITMQ_QUEUE_SUCCESS_IMAGE_BG_REMOVER,
             data: {
-              message: "Process of removing background has been successfully completed.",
+              message: "Process of removing background has been successfully completed",
               craftedImage: craftedImage
             }
           })
@@ -54,7 +60,7 @@ const callbackForConsume = async (data, channel) => {
       }
     } else {
       const message = 'Empty or invalid records received from removeBG API.';
-      await handleError(craftedImage._id, message, null);
+      await handleError(craftedImage._id, message, {});
     }
   } catch (error) {
     const message = 'Error processing and uploading photo while removing background.';

@@ -11,11 +11,11 @@ const axiosDatabase = axios.create({
 });
 
 const handleError = async (craftedImageId, message, error) => {
-  console.error(message, error);
+  console.error(`[${new Date().toISOString()}] ${message}`, error);
 
   await rabbitMQ_notification(RABBITMQ_QUEUE_NOTIFICATIONS, {
     name: RABBITMQ_QUEUE_ERROR_IMAGE_MANAGER,
-    data: { craftedImageId, message, error }
+    data: { craftedImageId, message, error: error.message }
   });
 };
 
@@ -26,15 +26,22 @@ const callbackForConsume = async (data, channel) => {
 
   try {
     const response = await axiosDatabase.post(`/api/database/manager/save_crafted_image`, craftedImage);
-    console.log('The CraftedImage is successfully saved in the database.');
 
-    await rabbitMQ_notification(RABBITMQ_QUEUE_NOTIFICATIONS, {
-      name: RABBITMQ_QUEUE_IMAGE_CRAFTING_FINISHED,
-      data: {
-        message: "Process of image crafting has been successfully finished.",
-        craftedImage: craftedImage
-      }
-    });
+    if (response.status === 201 && response.data.insertedId) {
+      const insertedId = response.data.insertedId;
+      console.log('The CraftedImage is successfully saved in the database. Inserted ID:', insertedId);
+
+      await rabbitMQ_notification(RABBITMQ_QUEUE_NOTIFICATIONS, {
+        name: RABBITMQ_QUEUE_IMAGE_CRAFTING_FINISHED,
+        data: {
+          message: "Process of image crafting has been successfully finished",
+          craftedImage: craftedImage
+        }
+      });
+    } else {
+      const message = 'Error saving CraftedImage in the database.';
+      await handleError(craftedImage._id, message, new Error('Invalid response from the database server'));
+    }
 
   } catch (error) {
     const message = 'Error saving CraftedImage in the database.';

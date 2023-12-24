@@ -25,6 +25,6 @@ export const fetchUser = () => async (dispatch) => {
     }
   }
   catch (error) {
-    dispatch(dispatchUserError(error));
+    dispatch(dispatchUserError(error.message));
   }
 };

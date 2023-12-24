@@ -3,6 +3,7 @@ import multer from 'multer';
 import craftImageHandler from "./request_handlers/craft_image_handler.js";
 import getCraftedImagesHandler from "./request_handlers/get_crafted_images_handler.js";
 import getUserIdFromToken from "../../middlewares/get_user_id_from_token_middleware.js";
+import getCraftedImageHandler from "./request_handlers/get_crafted_image_handler.js";
 
 
 const router = express.Router();
@@ -17,6 +18,8 @@ router.post('/craft_image', getUserIdFromToken, upload.fields([
 
 
 router.get('/get_crafted_images', getUserIdFromToken, getCraftedImagesHandler);
+
+router.get('/get_crafted_image/:craftedImageId', getUserIdFromToken, getCraftedImageHandler);
 
 
 export default router;

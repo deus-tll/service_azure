@@ -9,7 +9,6 @@ const craftImageHandler = async (req, res) => {
     const userId = req.userId;
     const { name } = req.body;
 
-
     if (!userId || !name) {
       console.error('User ID and name are required.');
       return res.status(400).json({ message: 'User ID and name are required.' });
@@ -34,13 +33,22 @@ const craftImageHandler = async (req, res) => {
     console.log("CRAFTED_IMAGE CREATED IN IMAGE_MANAGER", craftedImage);
 
 
-    const photoFrontResponse = await uploadFileToStorage(craftedImage._id, filePhotoFront, 'photo_front');
-    const photoBackgroundResponse = await uploadFileToStorage(craftedImage._id, filePhotoBackground, 'photo_background');
+    const photoFrontResponse = await uploadFileToStorage(craftedImage._id, {
+      buffer: filePhotoFront.buffer,
+      name: 'photo_front',
+      type: filePhotoFront.mimetype
+    });
+    const photoBackgroundResponse = await uploadFileToStorage(craftedImage._id, {
+      buffer: filePhotoBackground.buffer,
+      name: 'photo_background',
+      type: filePhotoBackground.mimetype
+    });
 
     if (!photoFrontResponse.success || !photoBackgroundResponse.success) {
       console.error('Failed to upload one or more photos.');
       return res.status(500).json({ message: 'Failed to upload one or more photos.' });
     }
+
 
     craftedImage.photoFrontUrl = photoFrontResponse.data.photoUrl;
     craftedImage.photoBackgroundUrl = photoBackgroundResponse.data.photoUrl;
